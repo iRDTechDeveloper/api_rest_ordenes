@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.ird.entity.Producto;
 import com.ird.repository.ProductoRepository;
+import com.ird.validator.ProductoValidator;
 
 @Service
 public class ProductoService {
@@ -34,6 +35,8 @@ public class ProductoService {
 	
 	@Transactional
 	public Producto producto_Cr_Up(Producto productoCU) {
+		
+		ProductoValidator.validarInsert(productoCU);
 		
 		if(productoCU.getId() == null) {
 			Producto crearNuevoProducto = prodRepo.save(productoCU);
