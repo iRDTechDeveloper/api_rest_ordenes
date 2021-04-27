@@ -1,6 +1,7 @@
 package com.ird.controllers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ird.DTO.ProductoDTO;
+import com.ird.converters.ProductoConverter;
 import com.ird.entity.Producto;
 import com.ird.services.ProductoService;
 
@@ -22,10 +25,16 @@ public class ProductoController {
 	@Autowired
 	private ProductoService prodServices;
 	
+	private ProductoConverter prodConvert = new ProductoConverter();
+	
 	@GetMapping(value = "producto/{productoId}")
-	public ResponseEntity<Producto> findProductoById(@PathVariable("productoId") Long productoId) {
+	public ResponseEntity<ProductoDTO> findProductoById(@PathVariable("productoId") Long productoId) {
+		
 		Producto producto = prodServices.findProductoById(productoId);
-		return new ResponseEntity<Producto>(producto, HttpStatus.OK);	
+		
+		ProductoDTO productoDTO = prodConvert.fromEntity(producto);
+		
+		return new ResponseEntity<ProductoDTO>(productoDTO, HttpStatus.OK);	
 	}
 	
 	@DeleteMapping(value = "deleteProducto/{productoId}")
@@ -35,21 +44,33 @@ public class ProductoController {
 	}
 	
 	@GetMapping(value = "productos")
-	public ResponseEntity<List<Producto>> findAllProducto(){
+	public ResponseEntity<List<ProductoDTO>> findAllProducto(){
+		
 		List<Producto> listaProductos = prodServices.findAllProducto();
-		return new ResponseEntity<List<Producto>>(listaProductos, HttpStatus.OK);
+		
+		List<ProductoDTO> listaProductosDTO = prodConvert.fromEntity(listaProductos);
+		
+		return new ResponseEntity<List<ProductoDTO>>(listaProductosDTO, HttpStatus.OK);
 	}
 	
 	@PostMapping(value = "/nuevoProducto")
-	public ResponseEntity<Producto> createProducto(@RequestBody Producto nuevoProducto) {
-		Producto crearNuevoProducto = prodServices.producto_Cr_Up(nuevoProducto);
-		return new ResponseEntity<Producto>(crearNuevoProducto, HttpStatus.CREATED);
+	public ResponseEntity<ProductoDTO> createProducto(@RequestBody ProductoDTO nuevoProducto) {
+		
+		Producto crearNuevoProducto = prodServices.producto_Cr_Up(prodConvert.fromDTO(nuevoProducto));
+		
+		ProductoDTO productoDTO = prodConvert.fromEntity(crearNuevoProducto);
+		
+		return new ResponseEntity<ProductoDTO>(productoDTO, HttpStatus.CREATED);
 	}
 	
 	@PutMapping(value = "/updateProducto")
-	public ResponseEntity<Producto> updateProducto(@RequestBody Producto updateProducto) {
-		Producto productoExistente = prodServices.producto_Cr_Up(updateProducto);
-		return new ResponseEntity<Producto>(productoExistente, HttpStatus.OK);
+	public ResponseEntity<ProductoDTO> updateProducto(@RequestBody ProductoDTO updateProducto) {
+		
+		Producto productoExistente = prodServices.producto_Cr_Up(prodConvert.fromDTO(updateProducto));
+		
+		ProductoDTO productoDTO = prodConvert.fromEntity(productoExistente);
+		
+		return new ResponseEntity<ProductoDTO>(productoDTO, HttpStatus.OK);
 	}
 	
 }
