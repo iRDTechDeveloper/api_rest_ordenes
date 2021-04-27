@@ -3,6 +3,9 @@ package com.ird.controllers;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,70 +15,53 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ird.entity.Producto;
+import com.ird.repository.ProductoRepository;
 
 @RestController
 public class ProductoController {
-
-	private List<Producto> productos = new ArrayList<>();
 	
-	public ProductoController() {
-		for (int cont = 0; cont < 10; cont++) {
-			productos.add(Producto.builder()
-					.id((cont + 1L))
-					.nombre("Producto" + (cont + 1L))
-					.categoria("Categoria" + (cont + 1L))
-					.build()
-					);
-		}
-	}
+	@Autowired
+	private ProductoRepository prodRepo;
 	
 	@GetMapping(value = "producto/{productoId}")
-	public Producto findProductoById(@PathVariable("productoId") Long productoId) {
-		for (Producto producto : this.productos) {
-			if (producto.getId().longValue() == productoId.longValue()) {
-				return producto;
-			}
-		}
-		return null;
+	public ResponseEntity<Producto> findProductoById(@PathVariable("productoId") Long productoId) {
+		Producto producto = prodRepo.findById(productoId)
+				.orElseThrow(() -> new RuntimeException("No Existe El Producto..."));
+		return new ResponseEntity<Producto>(producto, HttpStatus.OK);	
 	}
 	
 	@DeleteMapping(value = "deleteProducto/{productoId}")
-	public void deleteProducto(@PathVariable("productoId") Long productoId) {
-		Producto eliminarProducto = null;
-		
-		for (Producto producto : this.productos) {
-			
-			if (producto.getId().longValue() == productoId.longValue()) {
-				eliminarProducto = producto;
-				break;
-			}
-		}
-		if(eliminarProducto == null ) throw new RuntimeException("No Existe El Producto");
-		
-		this.productos.remove(eliminarProducto);
+	public ResponseEntity<Void> deleteProducto(@PathVariable("productoId") Long productoId) {
+		Producto producto = prodRepo.findById(productoId)
+				.orElseThrow(() -> new RuntimeException("No Existe El Producto..."));
+		prodRepo.delete(producto);
+		return new ResponseEntity(producto, HttpStatus.OK);
 	}
 	
 	@GetMapping(value = "productos")
-	public List<Producto> findAllProducto(){
-		return this.productos;
+	public ResponseEntity<List<Producto>> findAllProducto(){
+		List<Producto> listaProductos = prodRepo.findAll();
+		return new ResponseEntity<List<Producto>>(listaProductos, HttpStatus.OK);
 	}
 	
 	@PostMapping(value = "/nuevoProducto")
-	public Producto createProducto(@RequestBody Producto nuevoProducto) {
-		this.productos.add(nuevoProducto);
-		return nuevoProducto;
+	public ResponseEntity<Producto> createProducto(@RequestBody Producto nuevoProducto) {
+		Producto crearNuevoProducto = prodRepo.save(nuevoProducto);
+		return new ResponseEntity<Producto>(crearNuevoProducto, HttpStatus.CREATED);
 	}
 	
 	@PutMapping(value = "/updateProducto")
-	public Producto updateProducto(@RequestBody Producto updateProducto) {
-		for (Producto producto : this.productos) {
-			if (producto.getId().longValue() == updateProducto.getId().longValue()) {
-				producto.setNombre(updateProducto.getNombre());
-				producto.setCategoria(updateProducto.getCategoria());
-				return producto;
-			}
-		}
-		throw new RuntimeException("No Existe El Producto");
+	public ResponseEntity<Producto> updateProducto(@RequestBody Producto updateProducto) {
+		Producto productoExistente = prodRepo.findById(updateProducto.getId())
+				.orElseThrow(() -> new RuntimeException("No Existe El Producto..."));
+		
+		productoExistente.setNombre(updateProducto.getNombre());
+		productoExistente.setCategoria(updateProducto.getCategoria());
+		productoExistente.setPrecio(updateProducto.getPrecio());
+		
+		prodRepo.save(productoExistente);
+		
+		return new ResponseEntity<Producto>(productoExistente, HttpStatus.OK);
 	}
 	
 }
