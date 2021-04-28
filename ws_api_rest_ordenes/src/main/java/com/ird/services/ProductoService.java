@@ -3,6 +3,7 @@ package com.ird.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.ird.entity.Producto;
@@ -15,8 +16,8 @@ public class ProductoService {
 	@Autowired
 	private ProductoRepository prodRepo;
 	
-	public List<Producto> findAllProducto(){
-		List<Producto> listaProductos = prodRepo.findAll();
+	public List<Producto> findAllProducto(Pageable pagina){
+		List<Producto> listaProductos = prodRepo.findAll(pagina).toList();
 		return listaProductos;
 	}
 	
