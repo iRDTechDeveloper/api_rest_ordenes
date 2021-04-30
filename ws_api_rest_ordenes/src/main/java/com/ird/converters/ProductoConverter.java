@@ -3,10 +3,13 @@ package com.ird.converters;
 import com.ird.DTO.ProductoDTO;
 import com.ird.entity.Producto;
 
-public class ProductoConverter extends Converter<Producto, ProductoDTO>{
+public class ProductoConverter extends Converter<Producto, ProductoDTO> {
 
 	@Override
 	public ProductoDTO fromEntity(Producto entity) {
+		
+		if (entity == null) return null;
+
 		return ProductoDTO.builder()
 				.id(entity.getId())
 				.nombre(entity.getNombre())
@@ -17,6 +20,9 @@ public class ProductoConverter extends Converter<Producto, ProductoDTO>{
 
 	@Override
 	public Producto fromDTO(ProductoDTO dto) {
+		
+		if (dto == null) return null;
+		
 		return Producto.builder()
 				.id(dto.getId())
 				.nombre(dto.getNombre())
