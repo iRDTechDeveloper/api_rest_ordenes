@@ -16,19 +16,19 @@ import lombok.Setter;
 @AllArgsConstructor
 @Table(name = "PRODUCTOS")
 public class Producto {
-	
+
 	@Id
 	@Column(name = "Id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@Column(name = "NOMBRE", nullable = false, length = 50)
 	private String nombre;
-	
+
 	@Column(name = "CATEGORIA", nullable = false, length = 100)
 	private String categoria;
-	
+
 	@Column(name = "PRECIO", nullable = false)
 	private Double precio;
-	
+
 }
