@@ -3,8 +3,10 @@ package com.ird.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -34,7 +36,7 @@ public class Orden {
 	@Column(name = "FECHA_REGISTRO", nullable = false, updatable = false)
 	private LocalDateTime fechReg;
 
-	@OneToMany(mappedBy = "orden")
+	@OneToMany(mappedBy = "orden", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<LineaOrden> lineaOrden;
 
 	@Column(name = "TOTAL_PEDIDO", nullable = false)
