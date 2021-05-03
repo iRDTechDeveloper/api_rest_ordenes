@@ -9,11 +9,14 @@ import com.ird.DTO.OrdenDTO;
 import com.ird.entity.LineaOrden;
 import com.ird.entity.Orden;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public class OrdenConverter extends Converter<Orden, OrdenDTO> {
 
-	private static final DateTimeFormatter datoFormatoFecha = DateTimeFormatter.ofPattern("dd/mm/yyyy hh:mm:ss");
+	private DateTimeFormatter datoFormatoFecha;
 	
-	private ProductoConverter productoConverter = new ProductoConverter();
+	private ProductoConverter productoConverter;
 	
 	@Override
 	public OrdenDTO fromEntity(Orden entity) {

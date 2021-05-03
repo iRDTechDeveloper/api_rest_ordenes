@@ -25,7 +25,8 @@ import com.ird.utils.WrapperResponse;
 @RestController
 public class OrdenControllers {
 	
-	private OrdenConverter ordenConvert = new OrdenConverter();
+	@Autowired
+	private OrdenConverter ordenConvert;
 	
 	@Autowired
 	private OrdenService ordenService;
