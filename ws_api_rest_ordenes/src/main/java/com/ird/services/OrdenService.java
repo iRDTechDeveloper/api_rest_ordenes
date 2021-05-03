@@ -10,25 +10,31 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ird.entity.LineaOrden;
 import com.ird.entity.Orden;
+import com.ird.entity.Producto;
 import com.ird.exceptions.GeneralServiceException;
 import com.ird.exceptions.NoDataFoundException;
 import com.ird.exceptions.ValidateServiceException;
 import com.ird.repository.LineaOrdenesRepository;
 import com.ird.repository.OrdenRepository;
+import com.ird.repository.ProductoRepository;
+import com.ird.validator.OrdenValidator;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 public class OrdenService {
-	
+
 	@Autowired
 	private OrdenRepository ordenRepo;
-	
+
 	@Autowired
 	private LineaOrdenesRepository lineaOrdenRepo;
-	
-	public List<Orden> findAllOrdenes(Pageable pagina){
+
+	@Autowired
+	private ProductoRepository prodRepo;
+
+	public List<Orden> findAllOrdenes(Pageable pagina) {
 		try {
 			List<Orden> listaOrdenes = ordenRepo.findAll(pagina).toList();
 			return listaOrdenes;
@@ -38,13 +44,13 @@ public class OrdenService {
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			throw new GeneralServiceException(e.getMessage(), e);
-		}	
+		}
 	}
-	
+
 	public Orden findOrdenById(Long ordenId) {
 		try {
-			Orden orden = ordenRepo.findById(ordenId).orElseThrow(
-					() -> new NoDataFoundException("No Existe La Orden Buscada Por El Id Ingresado..."));
+			Orden orden = ordenRepo.findById(ordenId)
+					.orElseThrow(() -> new NoDataFoundException("No Existe La Orden Buscada Por El Id Ingresado..."));
 			return orden;
 		} catch (ValidateServiceException | NoDataFoundException e) {
 			log.info(e.getMessage(), e);
@@ -54,7 +60,7 @@ public class OrdenService {
 			throw new GeneralServiceException(e.getMessage(), e);
 		}
 	}
-	
+
 	@Transactional
 	public void deleteOrden(Long ordenId) {
 		try {
@@ -69,30 +75,38 @@ public class OrdenService {
 			throw new GeneralServiceException(e.getMessage(), e);
 		}
 	}
-	
+
 	@Transactional
 	public Orden orden_Cr_Up(Orden ordenCU) {
-		try {
-			//OrdenValidator.validarInsert(ordenCU); -- por crear OrdenValidator
+		try {		
+			double TotalPedido = 0;
+			OrdenValidator.validarInsert(ordenCU);
+
+			for (LineaOrden lineaOrden : ordenCU.getLineaOrden()) {
+				Producto producto = prodRepo.findById(lineaOrden.getProducto().getId())
+				.orElseThrow(() -> new NoDataFoundException("No Existe El Producto " + lineaOrden.getProducto().getId()));
+				
+				lineaOrden.setPrecio(producto.getPrecio());
+				lineaOrden.setTotalDetalle((producto.getPrecio() * lineaOrden.getCantidad()));				
+				TotalPedido += lineaOrden.getTotalDetalle();				
+			}
+			ordenCU.setTotalPedido(TotalPedido);
+
 			ordenCU.getLineaOrden().forEach(lineaOrden -> lineaOrden.setOrden(ordenCU));
-			
 			if (ordenCU.getId() == null) {
 				ordenCU.setFechReg(LocalDateTime.now());
 				Orden crearNuevaOrden = ordenRepo.save(ordenCU);
 				return crearNuevaOrden;
 			}
-			
 			Orden ordenExistente = ordenRepo.findById(ordenCU.getId())
 					.orElseThrow(() -> new NoDataFoundException("La Orden Que Desea Actualizar No Existe..."));
-			
 			ordenCU.setFechReg(ordenExistente.getFechReg());
-			
+
 			List<LineaOrden> eliminarLineaPedido = ordenExistente.getLineaOrden();
 			eliminarLineaPedido.removeAll(ordenCU.getLineaOrden());
 			lineaOrdenRepo.deleteAll(eliminarLineaPedido);
-			
-			return ordenRepo.save(ordenCU);
 
+			return ordenRepo.save(ordenCU);
 		} catch (ValidateServiceException | NoDataFoundException e) {
 			log.info(e.getMessage(), e);
 			throw e;
