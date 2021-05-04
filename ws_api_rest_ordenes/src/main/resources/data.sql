@@ -1,3 +1,5 @@
+insert into usuario (username, password) values ('Rasdavinhos', '12345');
+
 insert into productos (categoria, nombre, precio) values ('Categoria 1', 'Producto 1', 1000);
 insert into productos (categoria, nombre, precio) values ('Categoria 2', 'Producto 2', 2000);
 insert into productos (categoria, nombre, precio) values ('Categoria 3', 'Producto 3', 3000);
