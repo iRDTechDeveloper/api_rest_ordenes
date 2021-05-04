@@ -23,7 +23,7 @@ import com.ird.services.OrdenService;
 import com.ird.utils.WrapperResponse;
 
 @RestController
-public class OrdenControllers {
+public class OrdenController {
 	
 	@Autowired
 	private OrdenConverter ordenConvert;

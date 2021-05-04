@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.ird.converters.OrdenConverter;
 import com.ird.converters.ProductoConverter;
+import com.ird.converters.UserConverter;
 
 @Configuration
 public class Config {
@@ -24,6 +25,11 @@ public class Config {
 	public OrdenConverter getOrdenConverter() {
 		DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern(formatoFechaHora);
 		return new OrdenConverter(formatoFecha, getProductoConverter());
+	}
+	
+	@Bean
+	public UserConverter getUserConverter() {
+		return new UserConverter();
 	}
 
 }
