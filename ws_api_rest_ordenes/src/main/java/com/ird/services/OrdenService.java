@@ -5,12 +5,15 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ird.config.security.UserPrincipal;
 import com.ird.entity.LineaOrden;
 import com.ird.entity.Orden;
 import com.ird.entity.Producto;
+import com.ird.entity.User;
 import com.ird.exceptions.GeneralServiceException;
 import com.ird.exceptions.NoDataFoundException;
 import com.ird.exceptions.ValidateServiceException;
@@ -78,9 +81,11 @@ public class OrdenService {
 
 	@Transactional
 	public Orden orden_Cr_Up(Orden ordenCU) {
-		try {		
+		try {
 			double TotalPedido = 0;
 			OrdenValidator.validarInsert(ordenCU);
+			
+			User user = UserPrincipal.getCurrentUser();
 
 			for (LineaOrden lineaOrden : ordenCU.getLineaOrden()) {
 				Producto producto = prodRepo.findById(lineaOrden.getProducto().getId())
@@ -94,6 +99,7 @@ public class OrdenService {
 
 			ordenCU.getLineaOrden().forEach(lineaOrden -> lineaOrden.setOrden(ordenCU));
 			if (ordenCU.getId() == null) {
+				ordenCU.setUserDTO(user);
 				ordenCU.setFechReg(LocalDateTime.now());
 				Orden crearNuevaOrden = ordenRepo.save(ordenCU);
 				return crearNuevaOrden;

@@ -18,6 +18,8 @@ public class OrdenConverter extends Converter<Orden, OrdenDTO> {
 	
 	private ProductoConverter productoConverter;
 	
+	private UserConverter userConverter;
+	
 	@Override
 	public OrdenDTO fromEntity(Orden entity) {
 		if (entity == null) return null;
@@ -28,6 +30,7 @@ public class OrdenConverter extends Converter<Orden, OrdenDTO> {
 				.lineaOrdenDTO(listLineaOrdenDTO)
 				.fechReg(entity.getFechReg().format(datoFormatoFecha))
 				.totalPedido(entity.getTotalPedido())
+				.userDTO(userConverter.fromEntity(entity.getUserDTO()))
 				.build();
 	}
 
@@ -40,6 +43,7 @@ public class OrdenConverter extends Converter<Orden, OrdenDTO> {
 				.id(dto.getId())
 				.lineaOrden(listLineaOrden)
 				.totalPedido(dto.getTotalPedido())
+				.userDTO(userConverter.fromDTO(dto.getUserDTO()))
 				.build();
 	}
 	

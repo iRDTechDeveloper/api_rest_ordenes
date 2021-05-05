@@ -16,11 +16,9 @@ import lombok.Setter;
 public class OrdenDTO {
 
 	private Long id;
-
 	private String fechReg;
-
 	private List<LineaOrdenDTO> lineaOrdenDTO;
-
 	private Double totalPedido;
+	private UserDTO userDTO;
 
 }

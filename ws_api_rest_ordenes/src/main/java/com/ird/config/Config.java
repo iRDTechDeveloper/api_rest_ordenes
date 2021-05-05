@@ -24,7 +24,7 @@ public class Config {
 	@Bean
 	public OrdenConverter getOrdenConverter() {
 		DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern(formatoFechaHora);
-		return new OrdenConverter(formatoFecha, getProductoConverter());
+		return new OrdenConverter(formatoFecha, getProductoConverter(), getUserConverter());
 	}
 	
 	@Bean
