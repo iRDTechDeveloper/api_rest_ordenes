@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ird.DTO.LoginRequestDTO;
@@ -30,12 +31,12 @@ public class UserService {
 	
 	@Value("${jwt.password}")
 	private String jwtSecret;
-
 	@Autowired
 	private UserRepository userRepo;
-	
 	@Autowired
 	private UserConverter userConverter;
+	@Autowired
+	private PasswordEncoder pwsEncriptado;
 
 	public User createUser(User user) {
 		try {
@@ -45,6 +46,9 @@ public class UserService {
 					.orElse(null);
 			
 			if (userExistente != null) throw new ValidateServiceException("El Nombre de Usuario Ya Existe...");
+			
+			String passEncoder = pwsEncriptado.encode(user.getPassword());
+			user.setPassword(passEncoder);
 			
 			return userRepo.save(user);
 		} catch (ValidateServiceException | NoDataFoundException e) {
@@ -61,7 +65,10 @@ public class UserService {
 			User userLogin = userRepo.findByUsername(request.getUsername())
 					.orElseThrow(() -> new ValidateServiceException("El Usuario o Password Es Invalidos..."));
 			
-			if (! userLogin.getPassword().equals(request.getPassword())) throw new ValidateServiceException("El Usuario o Password Es Invalidos...");
+			if(! pwsEncriptado.matches(request.getPassword(), userLogin.getPassword()))
+				throw new ValidateServiceException("El Usuario o Password Es Invalidos...");
+			
+			//if (! userLogin.getPassword().equals(request.getPassword())) throw new ValidateServiceException("El Usuario o Password Es Invalidos...");
 			
 			String tokenLogin = createToken(userLogin);
 			
