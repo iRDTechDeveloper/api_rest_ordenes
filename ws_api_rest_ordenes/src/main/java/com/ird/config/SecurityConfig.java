@@ -45,9 +45,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.authenticationEntryPoint(new RestAuthenticationEntryPoiny())
 				.and()
 			.authorizeRequests()
+				.antMatchers("/",
+						"/error",
+						"/favicon.ico",
+						"/**/*.png",
+						"/**/*.gif",
+						"/**/*.svg",
+						"/**/*.jpg",
+						"/**/*.html",
+						"/**/*.css",
+						"/**/*.js",
+						"/**/*.woff2"
+						)
+					.permitAll()
 				.antMatchers(
 						"/crearUsuario",
-						"/login"
+						"/login",
+						"/v2/api-docs",
+						"/webjars/**",
+						"/swagger-resources/**"
 						)
 					.permitAll()
 				.anyRequest()
