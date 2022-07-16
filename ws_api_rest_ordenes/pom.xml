@@ -113,5 +113,28 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+	<profiles>
+		<profile>
+			<id>jar</id>
+			<properties>
+				<packaging.type>jar</packaging.type>
+				<spring.profiles.active>dev</spring.profiles.active>
+			</properties>
+		</profile>
+	</profiles>
+
+	<distributionManagement>
+		<repository>
+			<id>Artifactory</id>
+			<name>libs-releases</name>
+			<url>http://localhost:8081/artifactory/libs-release/</url>
+		</repository>
+		<snapshotRepository>
+			<id>Artifactory</id>
+			<name>libs-snapshots</name>
+			<url>http://localhost:8081/artifactory/libs-snapshot/</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 </project>
